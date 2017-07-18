@@ -1,0 +1,22 @@
+{
+  "name": "schedulerbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/debbiep168/SchedulerBot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/debbiep168/SchedulerBot/issues"
+  },
+  "homepage": "https://github.com/debbiep168/SchedulerBot#readme",
+  "dependencies": {
+    "@slack/client": "^3.10.0"
+  }
+}
