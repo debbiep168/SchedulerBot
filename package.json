@@ -18,6 +18,10 @@
   "homepage": "https://github.com/debbiep168/SchedulerBot#readme",
   "dependencies": {
     "@slack/client": "^3.10.0",
-    "axios": "^0.16.2"
+    "axios": "^0.16.2",
+    "body-parser": "^1.17.2",
+    "express": "^4.15.3",
+    "googleapis": "^20.1.0",
+    "mongoose": "^4.11.3"
   }
 }

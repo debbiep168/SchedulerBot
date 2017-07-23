@@ -7,10 +7,11 @@ var WebClient = require('@slack/client').WebClient;
 var token = process.env.SLACK_API_TOKEN || '';
 var web = new WebClient(token);
 var axios = require('axios');
+var models = require('./models/models');
+var User = models.User;
 let channel;
 
-// The client will emit an RTM.AUTHENTICATED event on successful connection,
-//with the `rtm.start` payload if you want to cache it
+
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
   console.log(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name},
     but not yet connected to a channel`);
@@ -23,6 +24,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     return;
   }
   channel = message.channel;
+  //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
      v: 20150910,
@@ -85,25 +87,67 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
               ]
            }
     ];
-    axios.get('https://slack.com/api/chat.postMessage', {
-      params: {
-        token: process.env.SLACK_BOT_TOKEN,
-        bot: 'chat:write:user',
-        as_user: true,
-        channel: channel,
-        text: "Okay! I will create a reminder for you 🗓",
-        attachments: JSON.stringify(attachments),
-      },
-      headers: {
-        type: 'application/x-www-form-urlencoded'
+
+    //CHECK TO SEE IF USER IS ALREADY IN DATABASE
+    User.findOne({user: message.user}, function(err, usr) {
+      //MAKE NEW USER IF FIRST TIME
+      if (usr === null) {
+        var newUser = new User ({
+          user: message.user,
+          slackDmId: channel,
+          pending: {},
+          google: {}
+        });
+        newUser.save(function(err, usr) {
+          console.log('NEWUSER!!!', usr._id);
+          rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+          rtm.sendMessage("http://ffc2b348.ngrok.io/connect?auth_id=" + usr._id, channel);
+          return;
+        });
       }
-    })
-    .then((resp) => {
-      console.log(resp.data);
-    })
-    .catch((err) => {
-      console.log(err);
-    })
+      //USER ALREADY IN DATABASE
+      else {
+        //DID NOT CONNECT GOOGLE CALENDAR
+        if (usr.google === undefined) {
+          rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+          rtm.sendMessage("http://ffc2b348.ngrok.io/connect?auth_id=" + usr._id, channel);
+          return;
+        }
+        //PREVIOUS REMINDER STILL PENDING
+        if (usr.pending !== undefined) {
+          rtm.sendMessage("I think you are trying to create a new reminder. If so, please press `Cancel` first to stop the current reminder.", channel);
+          return;
+        }
+        //SETTING NEW REMINDER
+        else {
+          usr.pending = {
+            subject: response.data.result.parameters.task[0],
+            date: response.data.result.parameters.date[0]
+          }
+          usr.save();
+          //SLACKBOT POSTS CONFIRMATION MESSAGE
+          axios.get('https://slack.com/api/chat.postMessage', {
+            params: {
+              token: process.env.SLACK_BOT_TOKEN,
+              bot: 'chat:write:user',
+              as_user: true,
+              channel: channel,
+              text: "Okay! I will create a reminder for you 🗓",
+              attachments: JSON.stringify(attachments),
+            },
+            headers: {
+              type: 'application/x-www-form-urlencoded'
+            }
+          })
+          .then((resp) => {
+            console.log(resp);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
+        }
+      }
+    });
   })
   .catch((err) => {
     console.log('Error is:', err);
@@ -111,3 +155,5 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
 });
 
 rtm.start();
+
+module.exports = rtm;
