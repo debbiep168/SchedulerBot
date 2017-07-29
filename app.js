@@ -15,7 +15,7 @@ var OAuth2 = google.auth.OAuth2;
 var oauth2Client = new OAuth2 (
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  'http://de1b2270.ngrok.io/connect/callback'
+  'https://salty-spire-12692.herokuapp.com/connect/callback'
 );
 const GOOGLE_SCOPE = ['https://www.googleapis.com/auth/userinfo.profile',
   'https://www.googleapis.com/auth/calendar'];

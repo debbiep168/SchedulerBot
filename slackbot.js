@@ -99,7 +99,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         });
         newUser.save(function(err, usr) {
           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage(" http://de1b2270.ngrok.io/connect?auth_id=" + usr._id, channel);
+          rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
           return;
         });
       }
@@ -108,7 +108,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         //DID NOT CONNECT GOOGLE CALENDAR
         if (usr.google === undefined) {
           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage(" http://de1b2270.ngrok.io/connect?auth_id=" + usr._id, channel);
+          rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
           return;
         }
         //PREVIOUS REMINDER STILL PENDING
