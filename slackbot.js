@@ -4,13 +4,13 @@ var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
 var bot_token = process.env.SLACK_BOT_TOKEN || '';
 var rtm = new RtmClient(bot_token);
 var WebClient = require('@slack/client').WebClient;
-var token = process.env.SLACK_API_TOKEN || '';
+var token = process.env.SLACK_BOT_TOKEN || '';
 var web = new WebClient(token);
 var axios = require('axios');
 var models = require('./models/models');
 var User = models.User;
+var Reminder = models.Reminder;
 let channel;
-
 
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
   console.log(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name},
@@ -20,7 +20,6 @@ rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
 rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   var dm = rtm.dataStore.getDMByUserId(message.user);
   if (!dm || dm.id !== message.channel || message.type !== 'message') {
-    console.log('MESSAGE NOT SENT TO DM, IGNORING');
     return;
   }
   channel = message.channel;
@@ -99,9 +98,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           google: {}
         });
         newUser.save(function(err, usr) {
-          console.log('NEWUSER!!!', usr._id);
           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage("http://ffc2b348.ngrok.io/connect?auth_id=" + usr._id, channel);
+          rtm.sendMessage(" http://de1b2270.ngrok.io/connect?auth_id=" + usr._id, channel);
           return;
         });
       }
@@ -110,7 +108,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         //DID NOT CONNECT GOOGLE CALENDAR
         if (usr.google === undefined) {
           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage("http://ffc2b348.ngrok.io/connect?auth_id=" + usr._id, channel);
+          rtm.sendMessage(" http://de1b2270.ngrok.io/connect?auth_id=" + usr._id, channel);
           return;
         }
         //PREVIOUS REMINDER STILL PENDING
@@ -156,4 +154,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
 
 rtm.start();
 
-module.exports = rtm;
+module.exports = {
+  rtm,
+  web
+};

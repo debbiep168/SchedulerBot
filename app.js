@@ -4,6 +4,8 @@ var bodyParser = require('body-parser');
 var rtm = require('./slackbot');
 var models = require('./models/models');
 var User = models.User;
+var Reminder = models.Reminder;
+var moment = require('moment');
 var app = express();
 
 //CONFIGURE GOOGLE APIS
@@ -13,7 +15,7 @@ var OAuth2 = google.auth.OAuth2;
 var oauth2Client = new OAuth2 (
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  'http://ffc2b348.ngrok.io/connect/callback'
+  'http://de1b2270.ngrok.io/connect/callback'
 );
 const GOOGLE_SCOPE = ['https://www.googleapis.com/auth/userinfo.profile',
   'https://www.googleapis.com/auth/calendar'];
@@ -72,10 +74,41 @@ app.post('/slack/interactive', function(req, res) {
     User.findOne({user: payload.user.id})
       .then(function(mongoUser) {
         var info = mongoUser.pending;
-        mongoUser.task = info.subject;
-        mongoUser.date = info.date;
+        //mongoUser.task = info.subject;
+        //mongoUser.date = info.date;
         mongoUser.pending = undefined;
-        return mongoUser.save();
+        mongoUser.save(function(err, usr) {
+          // oauth2Client.refreshAccessToken(function(err, tokens) {
+          // // your access_token is now refreshed and stored in oauth2Client
+          // // store these new tokens in a safe place (e.g. database)
+          // });
+          var newReminder = new Reminder({
+            user: usr.slackDmId,
+            date: info.date,
+            task: info.subject
+          });
+          newReminder.save(function(err, rem) {
+            console.log('GOING HERE');
+            var credentials = Object.assign({}, mongoUser.google);
+            oauth2Client.setCredentials(credentials);
+            var calendar = google.calendar('v3');
+            calendar.events.insert({
+              auth: oauth2Client,
+              calendarId: 'primary',
+              resource: {
+                summary: rem.task,
+                start: {
+                  date: rem.date,
+                  timeZone: 'America/Los_Angeles'
+                },
+                end: {
+                  date: rem.date,
+                  timeZone: 'America/Los_Angeles'
+                }
+              }
+            })
+          })
+        });
       })
     res.send('Created reminder :white_check_mark:');
   } else {
