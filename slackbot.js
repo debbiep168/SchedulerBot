@@ -166,11 +166,11 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           }
         }
       });
+    }
     })
     .catch((err) => {
       console.log('Error is:', err);
     });
-  }
 });
 
 rtm.start();
