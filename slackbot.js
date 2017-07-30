@@ -23,133 +23,277 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     return;
   }
   channel = message.channel;
-  //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
-  axios.get('https://api.api.ai/api/query', {
-   params: {
-     v: 20150910,
-     lang: 'en',
-     timezone: new Date(),
-     query: message.text,
-     sessionId: message.user
-   },
-   headers: {
-     Authorization: `Bearer ${process.env.API_AI_TOKEN}`
-   }
- })
-  .then((response) => {
-    if (response.data.result.parameters.date.length === 0) {
-      rtm.sendMessage('What is the date?', message.channel);
-      return;
-    }
-    if (response.data.result.parameters.task.length === 0) {
-      rtm.sendMessage('What is the task?', message.channel);
-      return;
-    }
-    var attachments = [
+  //USER WANTS TO SCHEDULE A MEETING
+  if (message.text.split(' ')[0] === 'Schedule' || message.text.split(' ')[0] === 'schedule') {
+    console.log('yay it worked', message);
+    var regex = /<@\w+>/g;
+    message.text = message.text.replace(regex, function(match) {
+      var userId = match.slice(2, -1);
+      var userObj = rtm.dataStore.getUserById(userId);
+      return userObj.profile.first_name || userObj.profile.real_name;
+    });
+    axios.get('https://api.api.ai/api/query', {
+     params: {
+       v: 20150910,
+       lang: 'en',
+       timezone: new Date(),
+       query: message.text,
+       sessionId: message.user
+     },
+     headers: {
+       Authorization: `Bearer ${process.env.API_AI_TOKEN}`
+     }
+   })
+   .then((response) => {
+     console.log('RESPONSEEEEEE', response.data.result.parameters);
+     if (response.data.result.parameters.date.length === 0) {
+       rtm.sendMessage('What is the date the meeting is held?', message.channel);
+       return;
+     }
+     if (response.data.result.parameters.time.length === 0) {
+       rtm.sendMessage('What time is the meeting?', message.channel);
+       return;
+     }
+     if (response.data.result.parameters.invitees.length === 0) {
+       rtm.sendMessage('Who are you meeting with?', message.channel);
+       return;
+     }
+     var attachments = [
+             {
+               "fallback": "You are unable to choose an option.",
+               "callback_id": "reminder",
+               "color": "#3AA3E3",
+               "attachment_type": "default",
+               "fields": [
+                {
+                    "title": "Subject",
+                    "value": response.data.result.parameters.task[0],
+                    "short": false
+                },
+                {
+                    "title": "Date",
+                    "value": response.data.result.parameters.date[0],
+                    "short": false
+                },
+              ]
+            },
             {
               "fallback": "You are unable to choose an option.",
               "callback_id": "reminder",
               "color": "#3AA3E3",
               "attachment_type": "default",
-              "fields": [
-               {
-                   "title": "Subject",
-                   "value": response.data.result.parameters.task[0],
-                   "short": false
-               },
-               {
-                   "title": "Date",
-                   "value": response.data.result.parameters.date[0],
-                   "short": false
-               },
-             ]
-           },
-           {
-             "fallback": "You are unable to choose an option.",
-             "callback_id": "reminder",
-             "color": "#3AA3E3",
-             "attachment_type": "default",
-             "text": "Is this reminder correct?",
-              "actions": [
-                {
-                  "name": "confirm",
-                  "text": "Confirm",
-                  "type": "button",
-                  "value": "true"
-                },
-                {
-                  "name": "confirm",
-                  "text": "Cancel",
-                  "type": "button",
-                  "value": "false"
-                }
-              ]
-           }
-    ];
-
-    //CHECK TO SEE IF USER IS ALREADY IN DATABASE
-    User.findOne({user: message.user}, function(err, usr) {
-      //MAKE NEW USER IF FIRST TIME
-      if (usr === null) {
-        var newUser = new User ({
-          user: message.user,
-          slackDmId: channel,
-          pending: {},
-          google: {}
-        });
-        newUser.save(function(err, usr) {
-          rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
-          return;
-        });
-      }
-      //USER ALREADY IN DATABASE
-      else {
-        //DID NOT CONNECT GOOGLE CALENDAR
-        if (usr.google === undefined) {
-          rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
-          rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
-          return;
-        }
-        //PREVIOUS REMINDER STILL PENDING
-        if (usr.pending !== undefined) {
-          rtm.sendMessage("I think you are trying to create a new reminder. If so, please press `Cancel` first to stop the current reminder.", channel);
-          return;
-        }
-        //SETTING NEW REMINDER
-        else {
-          usr.pending = {
-            subject: response.data.result.parameters.task[0],
-            date: response.data.result.parameters.date[0]
-          }
-          usr.save();
-          //SLACKBOT POSTS CONFIRMATION MESSAGE
-          axios.get('https://slack.com/api/chat.postMessage', {
-            params: {
-              token: process.env.SLACK_BOT_TOKEN,
-              bot: 'chat:write:user',
-              as_user: true,
-              channel: channel,
-              text: "Okay! I will create a reminder for you 🗓",
-              attachments: JSON.stringify(attachments),
-            },
-            headers: {
-              type: 'application/x-www-form-urlencoded'
+              "text": "Is this reminder correct?",
+               "actions": [
+                 {
+                   "name": "confirm",
+                   "text": "Confirm",
+                   "type": "button",
+                   "value": "true"
+                 },
+                 {
+                   "name": "confirm",
+                   "text": "Cancel",
+                   "type": "button",
+                   "value": "false"
+                 }
+               ]
             }
-          })
-          .then((resp) => {
-            console.log(resp);
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-        }
+     ];
+
+     //CHECK TO SEE IF USER IS ALREADY IN DATABASE
+     User.findOne({user: message.user}, function(err, usr) {
+       //MAKE NEW USER IF FIRST TIME
+       if (usr === null) {
+         var newUser = new User ({
+           user: message.user,
+           slackDmId: channel,
+           pending: {},
+           google: {}
+         });
+         newUser.save(function(err, usr) {
+           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+           rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+           return;
+         });
+       }
+       //USER ALREADY IN DATABASE
+       else {
+         //DID NOT CONNECT GOOGLE CALENDAR
+         if (usr.google === undefined) {
+           rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+           rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+           return;
+         }
+         //PREVIOUS REMINDER STILL PENDING
+         if (usr.pending !== undefined) {
+           rtm.sendMessage("I think you are trying to create a new reminder. If so, please press `Cancel` first to stop the current reminder.", channel);
+           return;
+         }
+         //SETTING NEW REMINDER
+         else {
+           usr.pending = {
+             subject: response.data.result.parameters.task[0],
+             date: response.data.result.parameters.date[0]
+           }
+           usr.save();
+           //SLACKBOT POSTS CONFIRMATION MESSAGE
+           axios.get('https://slack.com/api/chat.postMessage', {
+             params: {
+               token: process.env.SLACK_BOT_TOKEN,
+               bot: 'chat:write:user',
+               as_user: true,
+               channel: channel,
+               text: "Okay! I will create a reminder for you 🗓",
+               attachments: JSON.stringify(attachments),
+             },
+             headers: {
+               type: 'application/x-www-form-urlencoded'
+             }
+           })
+           .then((resp) => {
+             console.log(resp);
+           })
+           .catch((err) => {
+             console.log(err);
+           })
+         }
+       }
+     });
+   })
+   .catch((err) => {
+     console.log('Error is:', err);
+   });
+  }
+  //USER WANTS A CREATE A REMINDER
+  else {
+    //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
+    axios.get('https://api.api.ai/api/query', {
+     params: {
+       v: 20150910,
+       lang: 'en',
+       timezone: new Date(),
+       query: message.text,
+       sessionId: message.user
+     },
+     headers: {
+       Authorization: `Bearer ${process.env.API_AI_TOKEN}`
+     }
+   })
+    .then((response) => {
+      if (response.data.result.parameters.date.length === 0) {
+        rtm.sendMessage('What is the date?', message.channel);
+        return;
       }
+      if (response.data.result.parameters.task.length === 0) {
+        rtm.sendMessage('What is the task?', message.channel);
+        return;
+      }
+      var attachments = [
+              {
+                "fallback": "You are unable to choose an option.",
+                "callback_id": "reminder",
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "fields": [
+                 {
+                     "title": "Subject",
+                     "value": response.data.result.parameters.task[0],
+                     "short": false
+                 },
+                 {
+                     "title": "Date",
+                     "value": response.data.result.parameters.date[0],
+                     "short": false
+                 },
+               ]
+             },
+             {
+               "fallback": "You are unable to choose an option.",
+               "callback_id": "reminder",
+               "color": "#3AA3E3",
+               "attachment_type": "default",
+               "text": "Is this reminder correct?",
+                "actions": [
+                  {
+                    "name": "confirm",
+                    "text": "Confirm",
+                    "type": "button",
+                    "value": "true"
+                  },
+                  {
+                    "name": "confirm",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "false"
+                  }
+                ]
+             }
+      ];
+
+      //CHECK TO SEE IF USER IS ALREADY IN DATABASE
+      User.findOne({user: message.user}, function(err, usr) {
+        //MAKE NEW USER IF FIRST TIME
+        if (usr === null) {
+          var newUser = new User ({
+            user: message.user,
+            slackDmId: channel,
+            pending: {},
+            google: {}
+          });
+          newUser.save(function(err, usr) {
+            rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+            rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+            return;
+          });
+        }
+        //USER ALREADY IN DATABASE
+        else {
+          //DID NOT CONNECT GOOGLE CALENDAR
+          if (usr.google === undefined) {
+            rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+            rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+            return;
+          }
+          //PREVIOUS REMINDER STILL PENDING
+          if (usr.pending !== undefined) {
+            rtm.sendMessage("I think you are trying to create a new reminder. If so, please press `Cancel` first to stop the current reminder.", channel);
+            return;
+          }
+          //SETTING NEW REMINDER
+          else {
+            usr.pending = {
+              subject: response.data.result.parameters.task[0],
+              date: response.data.result.parameters.date[0]
+            }
+            usr.save();
+            //SLACKBOT POSTS CONFIRMATION MESSAGE
+            axios.get('https://slack.com/api/chat.postMessage', {
+              params: {
+                token: process.env.SLACK_BOT_TOKEN,
+                bot: 'chat:write:user',
+                as_user: true,
+                channel: channel,
+                text: "Okay! I will create a reminder for you 🗓",
+                attachments: JSON.stringify(attachments),
+              },
+              headers: {
+                type: 'application/x-www-form-urlencoded'
+              }
+            })
+            .then((resp) => {
+              console.log(resp);
+            })
+            .catch((err) => {
+              console.log(err);
+            })
+          }
+        }
+      });
+    })
+    .catch((err) => {
+      console.log('Error is:', err);
     });
-  })
-  .catch((err) => {
-    console.log('Error is:', err);
-  });
+  }
 });
 
 rtm.start();
