@@ -148,7 +148,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
               time: response.data.result.parameters.time,
-              invitees: response.data.result.parameters.invitees[0]
+              invitees: [{name: response.data.result.parameters.invitees[0], email: userObj.profile.email}]
             }
             usr.save();
             //SLACKBOT POSTS CONFIRMATION MESSAGE
