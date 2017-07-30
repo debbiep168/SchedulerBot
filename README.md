@@ -4,7 +4,7 @@ A language-aware and artificially intelligent Slackbot that can schedule reminde
 
 
 ## Getting Started
-# Prerequisites:
+### Prerequisites:
 
 Requires Node.js
 
