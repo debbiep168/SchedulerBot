@@ -110,29 +110,70 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
                 ]
              }
       ];
-      axios.get('https://slack.com/api/chat.postMessage', {
-        params: {
-          token: process.env.SLACK_BOT_TOKEN,
-          bot: 'chat:write:user',
-          as_user: true,
-          channel: channel,
-          text: "Okay! I will schedule a meeting for you 🗂",
-          attachments: JSON.stringify(attachments),
-        },
-        headers: {
-          type: 'application/x-www-form-urlencoded'
+      //CHECK TO SEE IF USER IS ALREADY IN DATABASE
+      User.findOne({user: message.user}, function(err, usr) {
+        //MAKE NEW USER IF FIRST TIME
+        if (usr === null) {
+          var newUser = new User ({
+            user: message.user,
+            slackDmId: channel,
+            pending: {},
+            google: {}
+          });
+          newUser.save(function(err, usr) {
+            rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+            rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+            return;
+          });
         }
-      })
-      .then((resp) => {
-        console.log(resp);
-      })
-      .catch((err) => {
-        console.log(err);
-      })
+        //USER ALREADY IN DATABASE
+        else {
+          //DID NOT CONNECT GOOGLE CALENDAR
+          if (usr.google === undefined) {
+            rtm.sendMessage("Welcome to SchedulerBot! To do a really good job, I need your permission to access your calendar. I will not be sharing your information with others, I just check when you are busy or free to meet. Please sign up with this link to connect your calendar:", channel);
+            rtm.sendMessage(" https://salty-spire-12692.herokuapp.com/connect?auth_id=" + usr._id, channel);
+            return;
+          }
+          //PREVIOUS MEETING STILL PENDING
+          if (usr.pending !== undefined) {
+            rtm.sendMessage("I think you are trying to schedule a new meeting. If so, please press `Cancel` first to stop the current meeting.", channel);
+            return;
+          }
+          //SETTING NEW REMINDER
+          else {
+            usr.pending = {
+              subject: response.data.result.parameters.subject || 'None',
+              date: response.data.result.parameters.date,
+              time: response.data.result.parameters.time,
+              invitees: response.data.result.parameters.invitees[0]
+            }
+            usr.save();
+            //SLACKBOT POSTS CONFIRMATION MESSAGE
+            axios.get('https://slack.com/api/chat.postMessage', {
+              params: {
+                token: process.env.SLACK_BOT_TOKEN,
+                bot: 'chat:write:user',
+                as_user: true,
+                channel: channel,
+                text: "Okay! I will schedule a meeting for you 🗂",
+                attachments: JSON.stringify(attachments),
+              },
+              headers: {
+                type: 'application/x-www-form-urlencoded'
+              }
+            })
+            .then((resp) => {
+              console.log(resp);
+            })
+            .catch((err) => {
+              console.log(err);
+            })
+          }
+        }
+      });
       return;
     }
     else {
-      console.log('here2')
       if (response.data.result.parameters.date.length === 0) {
         rtm.sendMessage('What is the date?', message.channel);
         return;

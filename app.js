@@ -69,6 +69,7 @@ app.get('/connect/callback', function(req, res) {
 
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
+  console.log('SLACKINTERACTIVEEEEE', req.body.payload)
   var payload = JSON.parse(req.body.payload);
   if (payload.actions[0].value === 'true') {
     User.findOne({user: payload.user.id})
