@@ -42,7 +42,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     if (i === users.length - 1) {
       attending += users[i].name;
     }
-    attending += users[i].name + ', ';
+    else {
+      attending += users[i].name + ', ';
+    }
   }
   console.log('ATTENINGG', attending)
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
