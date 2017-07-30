@@ -59,6 +59,76 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
+      var attachments = [
+              {
+                "fallback": "You are unable to choose an option.",
+                "callback_id": "meeting",
+                "color": "#3AA3E3",
+                "attachment_type": "default",
+                "fields": [
+                 {
+                     "title": "Subject",
+                     "value": response.data.result.parameters.subject || 'None',
+                     "short": false
+                 },
+                 {
+                     "title": "Date",
+                     "value": response.data.result.parameters.date,
+                     "short": false
+                 },
+                 {
+                     "title": "Time",
+                     "value": response.data.result.parameters.time,
+                     "short": false
+                 },
+                 {
+                     "title": "Invitees",
+                     "value": response.data.result.parameters.invitees,
+                     "short": false
+                 },
+               ]
+             },
+             {
+               "fallback": "You are unable to choose an option.",
+               "callback_id": "reminder",
+               "color": "#3AA3E3",
+               "attachment_type": "default",
+               "text": "Is this information correct for the meeting?",
+                "actions": [
+                  {
+                    "name": "confirm",
+                    "text": "Confirm",
+                    "type": "button",
+                    "value": "true"
+                  },
+                  {
+                    "name": "confirm",
+                    "text": "Cancel",
+                    "type": "button",
+                    "value": "false"
+                  }
+                ]
+             }
+      ];
+      axios.get('https://slack.com/api/chat.postMessage', {
+        params: {
+          token: process.env.SLACK_BOT_TOKEN,
+          bot: 'chat:write:user',
+          as_user: true,
+          channel: channel,
+          text: "Okay! I will schedule a meeting for you 🗂",
+          attachments: JSON.stringify(attachments),
+        },
+        headers: {
+          type: 'application/x-www-form-urlencoded'
+        }
+      })
+      .then((resp) => {
+        console.log(resp);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
       return;
     }
     else {
