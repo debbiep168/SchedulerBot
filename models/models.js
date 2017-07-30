@@ -20,10 +20,20 @@ var reminderSchema = new Schema({
   user: String
 });
 
+var meetingSchema = new Schema({
+  subject: String,
+  date: String,
+  user: String,
+  time: String,
+  invitees: Array
+})
+
 var User = mongoose.model('User', userSchema);
 var Reminder = mongoose.model('Reminder', reminderSchema);
+var Meeting = mongoose.model('Meeting', meetingSchema);
 
 module.exports = {
   User: User,
-  Reminder: Reminder
+  Reminder: Reminder,
+  Meeting: Meeting
 }

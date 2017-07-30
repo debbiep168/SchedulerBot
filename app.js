@@ -71,54 +71,62 @@ app.get('/connect/callback', function(req, res) {
 app.post('/slack/interactive', function(req, res) {
   console.log('SLACKINTERACTIVEEEEE', req.body.payload)
   var payload = JSON.parse(req.body.payload);
-  if (payload.actions[0].value === 'true') {
-    User.findOne({user: payload.user.id})
-      .then(function(mongoUser) {
-        var info = mongoUser.pending;
-        //mongoUser.task = info.subject;
-        //mongoUser.date = info.date;
-        mongoUser.pending = undefined;
-        mongoUser.save(function(err, usr) {
-          // oauth2Client.refreshAccessToken(function(err, tokens) {
-          // // your access_token is now refreshed and stored in oauth2Client
-          // // store these new tokens in a safe place (e.g. database)
-          // });
-          var newReminder = new Reminder({
-            user: usr.slackDmId,
-            date: info.date,
-            task: info.subject
-          });
-          newReminder.save(function(err, rem) {
-            console.log('GOING HERE');
-            var credentials = Object.assign({}, mongoUser.google);
-            oauth2Client.setCredentials(credentials);
-            var calendar = google.calendar('v3');
-            calendar.events.insert({
-              auth: oauth2Client,
-              calendarId: 'primary',
-              resource: {
-                summary: rem.task,
-                start: {
-                  date: rem.date,
-                  timeZone: 'America/Los_Angeles'
-                },
-                end: {
-                  date: rem.date,
-                  timeZone: 'America/Los_Angeles'
+  //SCHEDULING MEETINGS
+  if (payload.callback_id === 'meeting') {
+    console.log('MEETING HERE');
+    return;
+  }
+  //CREATING REMINDERS
+  else {
+    if (payload.actions[0].value === 'true') {
+      User.findOne({user: payload.user.id})
+        .then(function(mongoUser) {
+          var info = mongoUser.pending;
+          //mongoUser.task = info.subject;
+          //mongoUser.date = info.date;
+          mongoUser.pending = undefined;
+          mongoUser.save(function(err, usr) {
+            // oauth2Client.refreshAccessToken(function(err, tokens) {
+            // // your access_token is now refreshed and stored in oauth2Client
+            // // store these new tokens in a safe place (e.g. database)
+            // });
+            var newReminder = new Reminder({
+              user: usr.slackDmId,
+              date: info.date,
+              task: info.subject
+            });
+            newReminder.save(function(err, rem) {
+              console.log('GOING HERE');
+              var credentials = Object.assign({}, mongoUser.google);
+              oauth2Client.setCredentials(credentials);
+              var calendar = google.calendar('v3');
+              calendar.events.insert({
+                auth: oauth2Client,
+                calendarId: 'primary',
+                resource: {
+                  summary: rem.task,
+                  start: {
+                    date: rem.date,
+                    timeZone: 'America/Los_Angeles'
+                  },
+                  end: {
+                    date: rem.date,
+                    timeZone: 'America/Los_Angeles'
+                  }
                 }
-              }
+              })
             })
-          })
-        });
-      })
-    res.send('Created reminder :white_check_mark:');
-  } else {
-    User.findOne({user: payload.user.id})
-      .then(function(mongoUser) {
-        mongoUser.pending = undefined;
-        return mongoUser.save();
-      })
-      res.send('Cancelled :x:');
+          });
+        })
+      res.send('Created reminder :white_check_mark:');
+    } else {
+      User.findOne({user: payload.user.id})
+        .then(function(mongoUser) {
+          mongoUser.pending = undefined;
+          return mongoUser.save();
+        })
+        res.send('Cancelled :x:');
+    }
   }
 })
 
