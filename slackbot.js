@@ -11,7 +11,7 @@ var models = require('./models/models');
 var User = models.User;
 var Reminder = models.Reminder;
 let channel;
-let userObj;
+let users = [];
 
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
   console.log(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name},
@@ -29,9 +29,10 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
     userObj = rtm.dataStore.getUserById(userId);
+    users.push(userObj);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
-  console.log('USER OBJECTTTTTT', message.text);
+  console.log('USER OBJECTTTTTT', users);
   return;
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
