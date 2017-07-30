@@ -29,7 +29,11 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
     userObj = rtm.dataStore.getUserById(userId);
-    users.push(userObj);
+    var userObjToPush = {
+      name: userObj.profile.first_name || userObj.profile.real_name,
+      email: userObj.profile.email
+    }
+    users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   console.log('USER OBJECTTTTTT', users);
@@ -63,6 +67,14 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
+      var attending = '';
+      for (var i = 0; i < users; i++) {
+        if (i === users.length - 2) {
+          attending += users[i].name;
+          return;
+        }
+        attending += users[i].name + ', ';
+      }
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
@@ -87,7 +99,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
                  },
                  {
                      "title": "Invitees",
-                     "value": response.data.result.parameters.invitees[0],
+                     "value": attending,
                      "short": false
                  },
                ]
@@ -150,7 +162,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
               time: response.data.result.parameters.time,
-              invitees: [{name: response.data.result.parameters.invitees[0], email: userObj.profile.email}]
+              invitees: users
             }
             usr.save();
             //SLACKBOT POSTS CONFIRMATION MESSAGE
