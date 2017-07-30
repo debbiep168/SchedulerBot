@@ -90,7 +90,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
              },
              {
                "fallback": "You are unable to choose an option.",
-               "callback_id": "reminder",
+               "callback_id": "meeting",
                "color": "#3AA3E3",
                "attachment_type": "default",
                "text": "Is this information correct for the meeting?",
