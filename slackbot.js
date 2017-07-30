@@ -30,6 +30,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     var userObj = rtm.dataStore.getUserById(userId);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
+  console.log('USER OBJECTTTTTT', userObj);
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
@@ -141,6 +142,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           }
           //SETTING NEW REMINDER
           else {
+
             usr.pending = {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
