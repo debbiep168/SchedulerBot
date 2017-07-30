@@ -36,7 +36,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
-  console.log('USER OBJECTTTTTT', users);
   var attending = '';
   for (var i = 0; i < users.length; i++) {
     if (i === users.length - 1) {
@@ -46,7 +45,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       attending += users[i].name + ', ';
     }
   }
-  console.log('ATTENINGG', attending)
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
@@ -61,7 +59,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
-    console.log('RESPONSEEEEEEE', response.data.result.metadata, response.data.result.parameters)
     if (response.data.result.metadata.intentName === 'meeting') {
       if(response.data.result.parameters.invitees.length === 0) {
         console.log('here')

@@ -70,11 +70,9 @@ app.get('/connect/callback', function(req, res) {
 
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
-  console.log('SLACKINTERACTIVEEEEE', req.body.payload)
   var payload = JSON.parse(req.body.payload);
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
-    console.log('MEETING HERE');
     if (payload.actions[0].value === 'true') {
       User.findOne({user: payload.user.id})
         .then(function(mongoUser) {
@@ -93,7 +91,6 @@ app.post('/slack/interactive', function(req, res) {
               invitees: info.invitees
             });
             newMeeting.save(function(err, met) {
-              console.log('GOING HERE');
               var credentials = Object.assign({}, mongoUser.google);
               oauth2Client.setCredentials(credentials);
               var calendar = google.calendar('v3');
