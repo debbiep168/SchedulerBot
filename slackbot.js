@@ -83,7 +83,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
                  },
                  {
                      "title": "Invitees",
-                     "value": response.data.result.parameters.invitees,
+                     "value": response.data.result.parameters.invitees[0],
                      "short": false
                  },
                ]
