@@ -37,6 +37,15 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   console.log('USER OBJECTTTTTT', users);
+  var attending = '';
+  for (var i = 0; i < users.length; i++) {
+    if (i === users.length - 1) {
+      attending += users[i].name;
+      return;
+    }
+    attending += users[i].name + ', ';
+  }
+  console.log('ATTENINGG', attending)
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
@@ -66,15 +75,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
-      var attending = '';
-      for (var i = 0; i < users.length; i++) {
-        if (i === users.length - 1) {
-          attending += users[i].name;
-          return;
-        }
-        attending += users[i].name + ', ';
-      }
-      console.log('ATTENINGG', attending)
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
