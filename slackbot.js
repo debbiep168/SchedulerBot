@@ -44,7 +44,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
-    console.log('RESPONSEEEEEEE', response.data.result.parameters)
+    console.log('RESPONSEEEEEEE', response.data.result.metadata, response.data.result.parameters)
     if (response.data.result.metadata.intentName === 'meeting') {
       if(response.data.result.parameters.invitees.length === 0) {
         console.log('here')
@@ -59,14 +59,15 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
+      return;
     }
     else {
-      console.log('here')
+      console.log('here2')
       if (response.data.result.parameters.date.length === 0) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
-      if (response.data.result.parameters.invitees.length === 0 && response.data.result.parameters.task !== undefined && response.data.result.parameters.task.length === 0) {
+      if (response.data.result.parameters.task.length === 0) {
         rtm.sendMessage('What is the task?', message.channel);
         return;
       }
