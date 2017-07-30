@@ -103,7 +103,7 @@ app.post('/slack/interactive', function(req, res) {
                 calendarId: 'primary',
                 resource: {
                   summary: met.subject,
-                  attendees: met.invitees
+                  attendees: met.invitees,
                   start: {
                     dateTime: moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00'),
                     timeZone: 'America/Los_Angeles'
