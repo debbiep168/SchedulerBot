@@ -41,7 +41,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   for (var i = 0; i < users.length; i++) {
     if (i === users.length - 1) {
       attending += users[i].name;
-      return;
     }
     attending += users[i].name + ', ';
   }
