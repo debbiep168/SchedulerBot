@@ -32,6 +32,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   console.log('USER OBJECTTTTTT', message.text);
+  return;
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
