@@ -60,6 +60,10 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       rtm.sendMessage('What is the task?', message.channel);
       return;
     }
+    if (response.data.result.parameters.invitees) {
+      console.log('YAAAAY');
+      return;
+    }
     var attachments = [
             {
               "fallback": "You are unable to choose an option.",
