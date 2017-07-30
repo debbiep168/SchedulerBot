@@ -5,6 +5,7 @@ var rtm = require('./slackbot');
 var models = require('./models/models');
 var User = models.User;
 var Reminder = models.Reminder;
+var Meeting = models.Meeting;
 var moment = require('moment');
 var app = express();
 
@@ -74,6 +75,57 @@ app.post('/slack/interactive', function(req, res) {
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
     console.log('MEETING HERE');
+    if (payload.actions[0].value === 'true') {
+      User.findOne({user: payload.user.id})
+        .then(function(mongoUser) {
+          var info = mongoUser.pending;
+          mongoUser.pending = undefined;
+          mongoUser.save(function(err, usr) {
+            // oauth2Client.refreshAccessToken(function(err, tokens) {
+            // // your access_token is now refreshed and stored in oauth2Client
+            // // store these new tokens in a safe place (e.g. database)
+            // });
+            var newMeeting = new Meeting({
+              user: usr.slackDmId,
+              date: info.date,
+              subject: info.subject,
+              time: info.time,
+              invitees: info.invitees
+            });
+            newMeeting.save(function(err, met) {
+              console.log('GOING HERE');
+              var credentials = Object.assign({}, mongoUser.google);
+              oauth2Client.setCredentials(credentials);
+              var calendar = google.calendar('v3');
+              var dateTimeString = met.date + 'T' + met.time;
+              calendar.events.insert({
+                auth: oauth2Client,
+                calendarId: 'primary',
+                resource: {
+                  summary: met.subject,
+                  attendees: met.invitees
+                  start: {
+                    dateTime: moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00'),
+                    timeZone: 'America/Los_Angeles'
+                  },
+                  end: {
+                    dateTime: moment.utc(dateTimeString).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss-07:00'),
+                    timeZone: 'America/Los_Angeles'
+                  }
+                }
+              })
+            })
+          });
+        })
+      res.send('Scheduled meeting :white_check_mark:');
+    } else {
+      User.findOne({user: payload.user.id})
+        .then(function(mongoUser) {
+          mongoUser.pending = undefined;
+          return mongoUser.save();
+        })
+        res.send('Cancelled :x:');
+    }
     return;
   }
   //CREATING REMINDERS

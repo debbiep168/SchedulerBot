@@ -142,7 +142,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           //SETTING NEW REMINDER
           else {
             usr.pending = {
-              subject: response.data.result.parameters.subject || 'None',
+              subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
               time: response.data.result.parameters.time,
               invitees: response.data.result.parameters.invitees[0]
