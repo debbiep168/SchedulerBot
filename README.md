@@ -4,3 +4,10 @@ A language-aware and artificially intelligent Slackbot that can schedule reminde
 
 
 ## Getting Started
+# Prerequisites:
+
+Requires Node.js
+
+1. Download the repository
+2. Run npm install to download the node modules
+3. Run npm start to test out

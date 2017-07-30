@@ -13,11 +13,13 @@ var Reminder = models.Reminder;
 let channel;
 let users = [];
 
+//INITIALIZING SLACKBOT
 rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
   console.log(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name},
     but not yet connected to a channel`);
 });
 
+//WHEN THE SLACKBOT RECEIVES A MESSAGE
 rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   var dm = rtm.dataStore.getDMByUserId(message.user);
   if (!dm || dm.id !== message.channel || message.type !== 'message') {
@@ -36,6 +38,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
+  //USERS WHO ARE ATTENDING THE MEETING
   var attending = '';
   for (var i = 0; i < users.length; i++) {
     if (i === users.length - 1) {
@@ -59,9 +62,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
+    //USER WANTS TO SCHEDULE A MEETING
     if (response.data.result.metadata.intentName === 'meeting') {
       if(response.data.result.parameters.invitees.length === 0) {
-        console.log('here')
         rtm.sendMessage('Who are you meeting with?', message.channel);
         return;
       }
@@ -153,9 +156,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
             rtm.sendMessage("I think you are trying to schedule a new meeting. If so, please press `Cancel` first to stop the current meeting.", channel);
             return;
           }
-          //SETTING NEW REMINDER
+          //SETTING NEW MEETING
           else {
-
             usr.pending = {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
@@ -188,6 +190,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       });
       return;
     }
+    //USER WANTS TO CREATE A REMINDER
     else {
       if (response.data.result.parameters.date.length === 0) {
         rtm.sendMessage('What is the date?', message.channel);
