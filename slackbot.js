@@ -44,27 +44,32 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
-    if(response.data.result.parameters.invitees !== undefined && response.data.result.parameters.invitees === 0) {
-      rtm.sendMessage('Who are you meeting with?', message.channel);
-      return;
-    }
-    if (response.data.result.parameters.time !== undefined && response.data.result.parameters.time.length === 0) {
-      rtm.sendMessage('What time is the meeting?', message.channel);
-      return;
-    }
-    if (response.data.result.parameters.date.length === 0) {
-      rtm.sendMessage('What is the date?', message.channel);
-      return;
-    }
-    if (response.data.result.parameters.task !== undefined && response.data.result.parameters.task.length === 0) {
-      rtm.sendMessage('What is the task?', message.channel);
-      return;
-    }
-    if (response.data.result.parameters.invitees) {
-      console.log('YAAAAY');
-      return;
+    console.log('RESPONSEEEEEEE', response.data.result.parameters)
+    if (response.data.result.metadata.intentName === 'meeting') {
+      if(response.data.result.parameters.invitees.length === 0) {
+        console.log('here')
+        rtm.sendMessage('Who are you meeting with?', message.channel);
+        return;
+      }
+      if (response.data.result.parameters.time.length === 0) {
+        rtm.sendMessage('What time is the meeting?', message.channel);
+        return;
+      }
+      if (response.data.result.parameters.date.length === 0) {
+        rtm.sendMessage('What is the date?', message.channel);
+        return;
+      }
     }
     else {
+      console.log('here')
+      if (response.data.result.parameters.date.length === 0) {
+        rtm.sendMessage('What is the date?', message.channel);
+        return;
+      }
+      if (response.data.result.parameters.invitees.length === 0 && response.data.result.parameters.task !== undefined && response.data.result.parameters.task.length === 0) {
+        rtm.sendMessage('What is the task?', message.channel);
+        return;
+      }
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
