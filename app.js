@@ -67,7 +67,6 @@ app.get('/connect/callback', function(req, res) {
   });
 });
 
-
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
   var payload = JSON.parse(req.body.payload);
@@ -78,11 +77,23 @@ app.post('/slack/interactive', function(req, res) {
         .then(function(mongoUser) {
           var info = mongoUser.pending;
           mongoUser.pending = undefined;
+          //REFRESHING GOOGLE CALENDAR TOKEN IF HAS EXPIRED
+          if (parseInt(user.google.expiry_date) < Date.now()) {
+           oauth2Client.refreshAccessToken(function(err, tokens) {
+             if (err) {
+               res.json({failure: err})
+               return;
+             } else {
+               mongoUser.google.id_token = tokens.id_token;
+               mongoUser.google.refresh_token = tokens.refresh_token;
+               mongoUser.google.expiry_date = tokens.expiry_date;
+               mongoUser.google.token_type = tokens.token_type;
+               mongoUser.google.access_token = tokens.access_token;
+               return;
+             }
+           });
+         }
           mongoUser.save(function(err, usr) {
-            // oauth2Client.refreshAccessToken(function(err, tokens) {
-            // // your access_token is now refreshed and stored in oauth2Client
-            // // store these new tokens in a safe place (e.g. database)
-            // });
             var newMeeting = new Meeting({
               user: usr.slackDmId,
               date: info.date,
@@ -131,14 +142,24 @@ app.post('/slack/interactive', function(req, res) {
       User.findOne({user: payload.user.id})
         .then(function(mongoUser) {
           var info = mongoUser.pending;
-          //mongoUser.task = info.subject;
-          //mongoUser.date = info.date;
           mongoUser.pending = undefined;
+          if (parseInt(user.google.expiry_date) < Date.now()) {
+            //use refresh token --> get request
+           oauth2Client.refreshAccessToken(function(err, tokens) {
+             if (err) {
+               res.json({failure: err})
+               return;
+             } else {
+               mongoUser.google.id_token = tokens.id_token;
+               mongoUser.google.refresh_token = tokens.refresh_token;
+               mongoUser.google.expiry_date = tokens.expiry_date;
+               mongoUser.google.token_type = tokens.token_type;
+               mongoUser.google.access_token = tokens.access_token;
+               return;
+             }
+           });
+         }
           mongoUser.save(function(err, usr) {
-            // oauth2Client.refreshAccessToken(function(err, tokens) {
-            // // your access_token is now refreshed and stored in oauth2Client
-            // // store these new tokens in a safe place (e.g. database)
-            // });
             var newReminder = new Reminder({
               user: usr.slackDmId,
               date: info.date,

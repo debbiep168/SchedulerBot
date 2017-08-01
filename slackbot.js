@@ -7,6 +7,7 @@ var WebClient = require('@slack/client').WebClient;
 var token = process.env.SLACK_BOT_TOKEN || '';
 var web = new WebClient(token);
 var axios = require('axios');
+var findTimeConflicts = require('./helperFunctions/timeConflicts');
 var models = require('./models/models');
 var User = models.User;
 var Reminder = models.Reminder;
@@ -33,7 +34,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     userObj = rtm.dataStore.getUserById(userId);
     var userObjToPush = {
       name: userObj.profile.first_name || userObj.profile.real_name,
-      email: userObj.profile.email
+      email: userObj.profile.email,
+      userId: userId
     }
     users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
@@ -76,6 +78,14 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
+      for (var i = 0; i < users.length; i++) {
+        User.findOne({user: users[i].userId})
+          .then(function(usr) {
+            users[i].google = usr.google;
+          });
+      }
+      console.log('USERSSSS LIST', users);
+      return;
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
@@ -158,6 +168,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           }
           //SETTING NEW MEETING
           else {
+            //CHECK TO SEE AVAILABILITY
+            var dateTimeString = response.data.result.parameters.date + 'T' + response.data.result.parameters.time;
+            findTimeConflicts(users, dateTimeString);
             usr.pending = {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
