@@ -316,6 +316,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         }
       });
     }
+    //Catching
     else {
       return;
     }
