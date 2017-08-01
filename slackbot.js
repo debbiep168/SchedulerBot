@@ -205,7 +205,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       return;
     }
     //USER WANTS TO CREATE A REMINDER
-    else {
+    else if (response.data.result.metadata.intentName === 'reminder') {
       if (response.data.result.parameters.date.length === 0) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
@@ -315,6 +315,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           }
         }
       });
+    }
+    else {
+      return;
     }
     })
     .catch((err) => {
