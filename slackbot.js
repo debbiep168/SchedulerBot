@@ -89,6 +89,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           });
       }
       console.log('USERSSSS LIST', users);
+      return;
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
