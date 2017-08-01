@@ -65,7 +65,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
  })
   .then((response) => {
     //USER WANTS TO SCHEDULE A MEETING
+    console.log('RESPOSNEEEEEE', response.data.result.metadata);
     if (response.data.result.metadata.intentName === 'meeting') {
+      console.log('HERE');
       if(response.data.result.parameters.invitees.length === 0) {
         rtm.sendMessage('Who are you meeting with?', message.channel);
         return;
