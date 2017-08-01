@@ -70,6 +70,7 @@ app.get('/connect/callback', function(req, res) {
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
   var payload = JSON.parse(req.body.payload);
+  console.log('SLACK INTERACTIVEEEEEEE');
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
     if (payload.actions[0].value === 'true') {
