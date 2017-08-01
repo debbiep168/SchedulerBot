@@ -144,7 +144,7 @@ app.post('/slack/interactive', function(req, res) {
         .then(function(mongoUser) {
           var info = mongoUser.pending;
           mongoUser.pending = undefined;
-          if (parseInt(user.google.expiry_date) < Date.now()) {
+          if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
             //use refresh token --> get request
            oauth2Client.refreshAccessToken(function(err, tokens) {
              if (err) {
