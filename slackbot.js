@@ -81,9 +81,10 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
-      for (var i = 0; i < users.length; i++) {
+      for (var i = 0; i < users.length; i++) { //assume everyone has arleady given permission for now
         User.findOne({user: users[i].userId})
           .then(function(usr) {
+            console.log(usr);
             users[i].google = usr.google;
           });
       }
