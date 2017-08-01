@@ -172,7 +172,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           else {
             //CHECK TO SEE AVAILABILITY
             var dateTimeString = response.data.result.parameters.date + 'T' + response.data.result.parameters.time;
-            findTimeConflicts(users, dateTimeString);
+            // findTimeConflicts(users, dateTimeString);
             usr.pending = {
               subject: response.data.result.parameters.subject || 'Meeting',
               date: response.data.result.parameters.date,
