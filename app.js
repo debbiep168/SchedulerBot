@@ -79,7 +79,7 @@ app.post('/slack/interactive', function(req, res) {
           var info = mongoUser.pending;
           mongoUser.pending = undefined;
           //REFRESHING GOOGLE CALENDAR TOKEN IF HAS EXPIRED
-          if (parseInt(user.google.expiry_date) < Date.now()) {
+          if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
            oauth2Client.refreshAccessToken(function(err, tokens) {
              if (err) {
                res.json({failure: err})
