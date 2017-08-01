@@ -81,12 +81,12 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
-      for (var i = 0; i < users.length; i++) {
-        User.findOne({user: users[i].userId})
-          .then(function(usr) {
-            users[i].google = usr.google;
-          });
-      }
+      // for (var i = 0; i < users.length; i++) {
+      //   User.findOne({user: users[i].userId})
+      //     .then(function(usr) {
+      //       users[i].google = usr.google;
+      //     });
+      // }
       console.log('USERSSSS LIST', users);
       var attachments = [
               {
