@@ -20,10 +20,12 @@ Reminder.find({date: {$gt: cur, $lt: tom}})
         web.chat.postMessage(reminders[i].user, "REMINDER🎉: Remember to "
         + reminders[i].task + " today!");
         reminders[i].remove();
+        return;
       }
       else {
         web.chat.postMessage(reminders[i].user, "REMINDER🎉: Remember to "
         + reminders[i].task + " on " + reminders[i].date + "!");
+        return;
       }
     }
   });
