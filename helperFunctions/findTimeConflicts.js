@@ -21,11 +21,11 @@ function findTimeConflicts(invitees, date, time ) {
        access_token: invitees[i].google.id_token,
        refresh_token: invitees[i].google.refresh_token
      })
-    calendar.events.list ({
+    calendar.events.list({
       auth: oauth2Client,
       calendarId: 'primary',
-      timeMin: start,
-      timeMax: end,
+      timeMin: start.toISOString(),
+      timeMax: end.toISOString(),
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     })
