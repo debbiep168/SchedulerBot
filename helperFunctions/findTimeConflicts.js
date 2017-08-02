@@ -21,15 +21,22 @@ function findTimeConflicts(invitees, date, time) {
        access_token: invitees[i].google.id_token,
        refresh_token: invitees[i].google.refresh_token
      });
-    var events = calendar.events.list({
+    calendar.events.list({
       auth: oauth2Client,
       calendarId: 'primary',
       timeMin: start,
       timeMax: end,
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
+    }, function(err, events) {
+      if (err) {
+        console.log('ERROR', err);
+      }
+      else {
+        console.log('EVENTSSSSS', events);
+      }
     })
-    console.log('EVENTSSSSS', events);
+    //console.log('EVENTSSSSS', events);
   }
   return true;
 }
