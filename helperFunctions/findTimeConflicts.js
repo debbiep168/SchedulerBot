@@ -24,8 +24,9 @@ function findTimeConflicts(invitees, date, time ) {
     .then((res) => {
       console.log('RESPONSE IS', res);
     })
-    
+
   }
+  return true;
 }
 
 module.exports = {
