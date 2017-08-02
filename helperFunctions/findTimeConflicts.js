@@ -21,7 +21,7 @@ function findTimeConflicts(invitees, date, time) {
        access_token: invitees[i].google.id_token,
        refresh_token: invitees[i].google.refresh_token
      });
-    calendar.events.list({
+    var events = calendar.events.list({
       auth: oauth2Client,
       calendarId: 'primary',
       timeMin: start,
@@ -29,6 +29,7 @@ function findTimeConflicts(invitees, date, time) {
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     })
+    console.log('EVENTSSSSS', events);
   }
   return true;
 }
