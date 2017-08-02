@@ -32,12 +32,16 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
     userObj = rtm.dataStore.getUserById(userId);
-    var userObjToPush = {
-      name: userObj.profile.first_name || userObj.profile.real_name,
-      email: userObj.profile.email,
-      userId: userId
-    }
-    users.push(userObjToPush);
+    User.findOne({user: userId})
+      .then((usr) => {
+        var userObjToPush = {
+          name: userObj.profile.first_name || userObj.profile.real_name,
+          email: userObj.profile.email,
+          userId: userId,
+          google: usr.google
+        }
+        users.push(userObjToPush);
+      })
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   //USERS WHO ARE ATTENDING THE MEETING
@@ -90,14 +94,14 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //       }
       //     })
       //   })
-      users.map((usr) => {
-        User.findOne({user: usr.userId})
-          .then((user) => {
-            console.log('USRE IS', user)
-            usr.google = user.google;
-            return;
-          })
-      })
+      // users.map((usr) => {
+      //   User.findOne({user: usr.userId})
+      //     .then((user) => {
+      //       console.log('USRE IS', user)
+      //       usr.google = user.google;
+      //       return;
+      //     })
+      // })
       console.log('FINISHED LISTTTTTT', users);
       return;
       var attachments = [
