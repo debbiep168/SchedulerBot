@@ -93,6 +93,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       users.map((usr) => {
         User.findOne({user: usr.userId})
           .then((user) => {
+            console.log('USRE IS', user)
             usr.google = user.google;
             return;
           })
