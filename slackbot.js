@@ -81,14 +81,15 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         rtm.sendMessage('What is the date?', message.channel);
         return;
       }
-      for (var i = 0; i < users.length; i++) { //assume everyone has arleady given permission for now
-        User.findOne({user: users[i].userId})
-          .then(function(usr) {
-            console.log(usr);
-            users[i].google = usr.google;
-          });
-      }
-      console.log('USERSSSS LIST', users);
+      User.find() //assume everyone has arleady given permission for now
+        .then(function(mongoUsers) {
+          for (var i = 0; i < mongoUsers.length; i++) {
+            if (mongoUsers[i].userId === users[i].userId) {
+              users[i].google = mongoUsers[i].google;
+            }
+          }
+          console.log('USERSSSS LIST', users);
+        })
       return;
       var attachments = [
               {
