@@ -83,12 +83,12 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       }
       User.find() //assume everyone has arleady given permission for now
         .then(function(mongoUsers) {
+          console.log('USERSSSS LIST', mongoUsers);
           for (var i = 0; i < mongoUsers.length; i++) {
             if (mongoUsers[i].userId === users[i].userId) {
               users[i].google = mongoUsers[i].google;
             }
           }
-          console.log('USERSSSS LIST', users);
         })
       return;
       var attachments = [
