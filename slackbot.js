@@ -10,7 +10,7 @@ var axios = require('axios');
 var models = require('./models/models');
 var User = models.User;
 var Reminder = models.Reminder;
-var findTimeConflicts = require('./helperFunctions/findTimeConflicts');
+var { findTimeConflicts } = require('./helperFunctions/findTimeConflicts');
 let channel;
 let users = [];
 
