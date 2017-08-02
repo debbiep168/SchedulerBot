@@ -22,7 +22,6 @@ rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
 
 //WHEN THE SLACKBOT RECEIVES A MESSAGE
 rtm.on(RTM_EVENTS.MESSAGE, function (message) {
-  console.log('I AM A FUNCTIONNNNNNN', findTimeConflicts);
   var dm = rtm.dataStore.getDMByUserId(message.user);
   if (!dm || dm.id !== message.channel || message.type !== 'message') {
     return;
@@ -118,8 +117,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //   checkCalendarAccess(usr, web, rtm);
       //   //if not given calendar access --> send message saying need permission
       // })
-      findTimeConflicts(users, response.data.result.parameters.date.length, response.data.result.parameters.time.length);
       console.log('FINISHED LISTTTTTT', users);
+      findTimeConflicts(users, response.data.result.parameters.date.length, response.data.result.parameters.time.length);
       return;
       // if (result === false) {
       //   return;
