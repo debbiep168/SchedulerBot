@@ -29,9 +29,6 @@ function findTimeConflicts(invitees, date, time ) {
   return true;
 }
 
-module.exports = {
-  findTimeConflicts
-}
 
 //when someone sends a message to the slackbot to schedule a meeting,
 //get all the google auth to access the @users calendars
@@ -39,3 +36,7 @@ module.exports = {
 //check for time conflicts
 //if yes then send back different times
 // if not conflicts do the usual
+
+module.exports = {
+  findTimeConflicts
+}
