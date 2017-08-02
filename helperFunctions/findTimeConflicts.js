@@ -13,7 +13,7 @@ var oauth2Client = new OAuth2 (
 function findTimeConflicts(invitees, date, time) {
   var calendar = google.calendar('v3');
   var dateTimeString = date + 'T' + time;
-  console.log('DATE TIME STRING', dateTimeString);
+  // console.log('DATE TIME STRING', dateTimeString);
   var start = moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00');
   var end = moment.utc(dateTimeString).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss-07:00');
   for (var i = 0; i < invitees.length; i++) {
