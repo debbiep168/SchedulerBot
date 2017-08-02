@@ -10,7 +10,7 @@ var oauth2Client = new OAuth2 (
 );
 
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
-function findTimeConflicts(invitees, date, time ) {
+function findTimeConflicts(invitees, date, time) {
   var calendar = google.calendar('v3');
   var dateTimeString = date + 'T' + time;
   console.log('DATE TIME STRING', dateTimeString);
@@ -20,7 +20,7 @@ function findTimeConflicts(invitees, date, time ) {
      oauth2Client.setCredentials({
        access_token: invitees[i].google.id_token,
        refresh_token: invitees[i].google.refresh_token
-     })
+     });
     calendar.events.list({
       auth: oauth2Client,
       calendarId: 'primary',
@@ -29,10 +29,6 @@ function findTimeConflicts(invitees, date, time ) {
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     })
-    .then((res) => {
-      console.log('RESPONSE IS', res);
-    })
-
   }
   return true;
 }
