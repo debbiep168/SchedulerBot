@@ -28,13 +28,8 @@ function findTimeConflicts(invitees, date, time) {
       timeMax: end,
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
-    }, function(err, events) {
-      if (err) {
-        console.log('ERROR', err);
-      }
-      else {
-        console.log('EVENTSSSSS', events);
-      }
+    }, function(events) {
+      console.log("EVENTSSSSS", events);
     })
     //console.log('EVENTSSSSS', events);
   }
