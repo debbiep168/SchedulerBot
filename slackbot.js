@@ -34,14 +34,24 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     userObj = rtm.dataStore.getUserById(userId);
     User.findOne({user: userId})
       .then((usr) => {
+        if (usr.google === undefined) {
+          //send a message saying that the invitee hasn't set up their google calendar yet
+          return;
+        }
         var userObjToPush = {
           name: userObj.profile.first_name || userObj.profile.real_name,
           email: userObj.profile.email,
           userId: userId,
-          google: usr.google
+          google: usr.google //ASSUME FOR NOW THAT EVERYONE HAS ALREADY SIGNED UP
         }
         users.push(userObjToPush);
       })
+    // var userObjToPush = {
+    //   name: userObj.profile.first_name || userObj.profile.real_name,
+    //   email: userObj.profile.email,
+    //   userId: userId
+    // }
+    // users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   //USERS WHO ARE ATTENDING THE MEETING
@@ -102,8 +112,17 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //       return;
       //     })
       // })
+
+      // users.map((usr) => {
+      //   checkCalendarAccess(usr, web, rtm);
+      //   //if not given calendar access --> send message saying need permission
+      // })
       console.log('FINISHED LISTTTTTT', users);
+      findTimeConflicts(users, response.data.result.parameters.date.length, response.data.result.parameters.time.length);
       return;
+      // if (result === false) {
+      //   return;
+      // }
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
