@@ -22,6 +22,7 @@ rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, function (rtmStartData) {
 
 //WHEN THE SLACKBOT RECEIVES A MESSAGE
 rtm.on(RTM_EVENTS.MESSAGE, function (message) {
+  console.log('I AM A FUNCTIONNNNNNN', findTimeConflicts);
   var dm = rtm.dataStore.getDMByUserId(message.user);
   if (!dm || dm.id !== message.channel || message.type !== 'message') {
     return;
