@@ -24,8 +24,8 @@ function findTimeConflicts(invitees, date, time ) {
     calendar.events.list({
       auth: oauth2Client,
       calendarId: 'primary',
-      timeMin: start.toISOString(),
-      timeMax: end.toISOString(),
+      timeMin: dateTimeString.toISOString(),
+      timeMax: end,
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     })
