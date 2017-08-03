@@ -119,7 +119,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       // })
       console.log('FINISHED LISTTTTTT', users);
       var timeConflict = findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time);
-      if (timeConflict === true) {
+      if (timeConflict.length > 0) {
         console.log('WHAT IS THIS', timeConflict)
         rtm.sendMessage("This time is not available! Please pick another time.", channel);
       }
