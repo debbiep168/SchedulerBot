@@ -32,9 +32,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   var regex = /<@\w+>/g;
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
-    console.log('USERID IS', userId);
+    //console.log('USERID IS', userId);
     userObj = rtm.dataStore.getUserById(userId);
-    console.log('THIS FINDS THE USER OBJECT FINE', userObj);
+    //console.log('THIS FINDS THE USER OBJECT FINE', userObj);
     //assume everyone is old user and already has gcalendar
     User.findOne({user: userId})
       .then((usr) => {
@@ -85,6 +85,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
+    console.log('USERSSSSS22222222', users);
     //USER WANTS TO SCHEDULE A MEETING
     console.log('RESPOSNEEEEEE', response.data.result.metadata);
     if (response.data.result.metadata.intentName === 'meeting') {
