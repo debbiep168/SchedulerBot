@@ -64,6 +64,7 @@ app.get('/connect/callback', function(req, res) {
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
   var payload = JSON.parse(req.body.payload);
+  var gClient = oauth2Client();
   console.log('SLACK INTERACTIVEEEEEEE', oauth2Client);
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
@@ -74,7 +75,7 @@ app.post('/slack/interactive', function(req, res) {
           mongoUser.pending = undefined;
           //REFRESHING GOOGLE CALENDAR TOKEN IF HAS EXPIRED
           if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
-           oauth2Client().refreshAccessToken(function(err, tokens) {
+           gClient.refreshAccessToken(function(err, tokens) {
              if (err) {
                res.json({failure: err})
                return;
@@ -98,11 +99,11 @@ app.post('/slack/interactive', function(req, res) {
             });
             newMeeting.save(function(err, met) {
               var credentials = Object.assign({}, mongoUser.google);
-              oauth2Client().setCredentials(credentials);
+              gClient.setCredentials(credentials);
               var calendar = google.calendar('v3');
               var dateTimeString = met.date + 'T' + met.time;
               calendar.events.insert({
-                auth: oauth2Client(),
+                auth: gClient,
                 calendarId: 'primary',
                 resource: {
                   summary: met.subject,
@@ -140,7 +141,7 @@ app.post('/slack/interactive', function(req, res) {
           mongoUser.pending = undefined;
           if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
             //use refresh token --> get request
-           oauth2Client().refreshAccessToken(function(err, tokens) {
+           gClient.refreshAccessToken(function(err, tokens) {
              if (err) {
                res.json({failure: err})
                return;
@@ -163,10 +164,10 @@ app.post('/slack/interactive', function(req, res) {
             newReminder.save(function(err, rem) {
               console.log('GOING HERE');
               var credentials = Object.assign({}, mongoUser.google);
-              oauth2Client().setCredentials(credentials);
+              gClient.setCredentials(credentials);
               var calendar = google.calendar('v3');
               calendar.events.insert({
-                auth: oauth2Client(),
+                auth: gClient,
                 calendarId: 'primary',
                 resource: {
                   summary: rem.task,
