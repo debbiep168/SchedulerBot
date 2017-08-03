@@ -33,13 +33,14 @@ app.get('/connect', function(req, res) {
 
 //ROUTE CALLBACK THAT INDICATES SUCCESS IN CONNECTING TO GOOGLE CALENDAR
 app.get('/connect/callback', function(req, res) {
-  oauth2Client().getToken(req.query.code, function (err, tokens) {
+  var gClient = oauth2Client();
+  gClient.getToken(req.query.code, function (err, tokens) {
     if (err) {
       res.status(500).json({error: err});
     }
     else {
-      oauth2Client().setCredentials(tokens);
-      plus.people.get({ auth: oauth2Client(), userId: 'me'}, function(err, googleUser) {
+      gClient.setCredentials(tokens);
+      plus.people.get({ auth: gClient, userId: 'me'}, function(err, googleUser) {
         if (err) {
           res.status(500).json({error: err});
         } else {
@@ -73,7 +74,7 @@ app.post('/slack/interactive', function(req, res) {
           mongoUser.pending = undefined;
           //REFRESHING GOOGLE CALENDAR TOKEN IF HAS EXPIRED
           if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
-           oauth2Client.refreshAccessToken(function(err, tokens) {
+           oauth2Client().refreshAccessToken(function(err, tokens) {
              if (err) {
                res.json({failure: err})
                return;
@@ -139,7 +140,7 @@ app.post('/slack/interactive', function(req, res) {
           mongoUser.pending = undefined;
           if (parseInt(mongoUser.google.expiry_date) < Date.now()) {
             //use refresh token --> get request
-           oauth2Client.refreshAccessToken(function(err, tokens) {
+           oauth2Client().refreshAccessToken(function(err, tokens) {
              if (err) {
                res.json({failure: err})
                return;
