@@ -118,7 +118,10 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //   //if not given calendar access --> send message saying need permission
       // })
       console.log('FINISHED LISTTTTTT', users);
-      findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time);
+      var timeConflict = findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time);
+      if (timeConflict) {
+        rtm.sendMessage("This time is not available! Please pick another time.", channel);
+      }
       return;
       // if (result === false) {
       //   return;

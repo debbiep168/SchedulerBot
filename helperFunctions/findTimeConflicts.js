@@ -6,7 +6,8 @@ var { oauth2Client } = require('./configureGoogle');
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
 function findTimeConflicts(invitees, date, time) {
   var gClient = oauth2Client();
-  var dateTimeString = date + 'T' + time;
+  //var dateTimeString = date + 'T' + time;
+  var dateTimeString = '2017-08-02T20:00:00';
   console.log('DATE TIME STRING', dateTimeString);
   var start = moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00');
   var end = moment.utc(dateTimeString).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss-07:00');
@@ -22,7 +23,13 @@ function findTimeConflicts(invitees, date, time) {
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     }, function(err, events) {
-      console.log("EVENTSSSSS", events, err);
+      if (err) {
+        return null;
+      }
+      else {
+        console.log("EVENTSSSSS", events);
+        return true;
+      }
     })
     //console.log('EVENTSSSSS', events);
   }
