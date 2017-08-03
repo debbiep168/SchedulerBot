@@ -1,6 +1,5 @@
 //CONFIGURE GOOGLE APIS
 var google = require('googleapis');
-var plus = google.plus('v1');
 var OAuth2 = google.auth.OAuth2;
 
 function oauth2Client() {

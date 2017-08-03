@@ -7,6 +7,7 @@ var User = models.User;
 var Reminder = models.Reminder;
 var Meeting = models.Meeting;
 var moment = require('moment');
+var plus = google.plus('v1');
 var { oauth2Client } = require('./helperFunctions/configureGoogle');
 var app = express();
 const GOOGLE_SCOPE = ['https://www.googleapis.com/auth/userinfo.profile',
