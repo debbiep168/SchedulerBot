@@ -85,7 +85,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     }
   }
   console.log('ATTENDING', attending);
-  return;
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
