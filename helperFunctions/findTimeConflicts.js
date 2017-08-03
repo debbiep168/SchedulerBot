@@ -1,13 +1,5 @@
 var moment = require('moment');
-//CONFIGURE GOOGLE APIS
-var google = require('googleapis');
-var plus = google.plus('v1');
-var OAuth2 = google.auth.OAuth2;
-var oauth2Client = new OAuth2 (
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  'https://floating-headland-63670.herokuapp.com/connect/callback'
-);
+var { oauth2Client } = require('./configureGoogle');
 
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
 function findTimeConflicts(invitees, date, time) {
@@ -17,12 +9,12 @@ function findTimeConflicts(invitees, date, time) {
   var start = moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00');
   var end = moment.utc(dateTimeString).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss-07:00');
   for (var i = 0; i < invitees.length; i++) {
-     oauth2Client.setCredentials({
+     oauth2Client().setCredentials({
        access_token: invitees[i].google.id_token,
        refresh_token: invitees[i].google.refresh_token
      });
     calendar.events.list({
-      auth: oauth2Client,
+      auth: oauth2Client(),
       calendarId: 'primary',
       timeMin: start,
       timeMax: end,

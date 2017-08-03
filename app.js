@@ -7,17 +7,8 @@ var User = models.User;
 var Reminder = models.Reminder;
 var Meeting = models.Meeting;
 var moment = require('moment');
+var { oauth2Client } = require('./helperFunctions/configureGoogle');
 var app = express();
-
-//CONFIGURE GOOGLE APIS
-var google = require('googleapis');
-var plus = google.plus('v1');
-var OAuth2 = google.auth.OAuth2;
-var oauth2Client = new OAuth2 (
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  'https://floating-headland-63670.herokuapp.com/connect/callback'
-);
 const GOOGLE_SCOPE = ['https://www.googleapis.com/auth/userinfo.profile',
   'https://www.googleapis.com/auth/calendar'];
 
@@ -29,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 //ROUTE TO GENERATE URL TO CONNECT GOOGLE CALENDAR
 app.get('/connect', function(req, res) {
-  var url = oauth2Client.generateAuthUrl({
+  var url = oauth2Client().generateAuthUrl({
     access_type: 'offline',
     prompt: 'consent',
     scope: GOOGLE_SCOPE,
@@ -40,12 +31,12 @@ app.get('/connect', function(req, res) {
 
 //ROUTE CALLBACK THAT INDICATES SUCCESS IN CONNECTING TO GOOGLE CALENDAR
 app.get('/connect/callback', function(req, res) {
-  oauth2Client.getToken(req.query.code, function (err, tokens) {
+  oauth2Client().getToken(req.query.code, function (err, tokens) {
     if (err) {
       res.status(500).json({error: err});
     }
     else {
-      oauth2Client.setCredentials(tokens);
+      oauth2Client().setCredentials(tokens);
       plus.people.get({ auth: oauth2Client, userId: 'me'}, function(err, googleUser) {
         if (err) {
           res.status(500).json({error: err});
@@ -70,7 +61,7 @@ app.get('/connect/callback', function(req, res) {
 //CALLBACK ROUTE THAT IS HIT EVERY TIME USER PRESSES INTERACTIVE MESSAGES BUTTONS ON SLACK
 app.post('/slack/interactive', function(req, res) {
   var payload = JSON.parse(req.body.payload);
-  console.log('SLACK INTERACTIVEEEEEEE');
+  console.log('SLACK INTERACTIVEEEEEEE', oauth2Client);
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
     if (payload.actions[0].value === 'true') {
@@ -104,11 +95,11 @@ app.post('/slack/interactive', function(req, res) {
             });
             newMeeting.save(function(err, met) {
               var credentials = Object.assign({}, mongoUser.google);
-              oauth2Client.setCredentials(credentials);
+              oauth2Client().setCredentials(credentials);
               var calendar = google.calendar('v3');
               var dateTimeString = met.date + 'T' + met.time;
               calendar.events.insert({
-                auth: oauth2Client,
+                auth: oauth2Client(),
                 calendarId: 'primary',
                 resource: {
                   summary: met.subject,
@@ -169,10 +160,10 @@ app.post('/slack/interactive', function(req, res) {
             newReminder.save(function(err, rem) {
               console.log('GOING HERE');
               var credentials = Object.assign({}, mongoUser.google);
-              oauth2Client.setCredentials(credentials);
+              oauth2Client().setCredentials(credentials);
               var calendar = google.calendar('v3');
               calendar.events.insert({
-                auth: oauth2Client,
+                auth: oauth2Client(),
                 calendarId: 'primary',
                 resource: {
                   summary: rem.task,
