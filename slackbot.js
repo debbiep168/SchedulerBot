@@ -32,6 +32,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
     userObj = rtm.dataStore.getUserById(userId);
+    //assume everyone is old user and already has gcalendar
     User.findOne({user: userId})
       .then((usr) => {
         if (usr.google === undefined) {
@@ -54,6 +55,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     // users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
+  console.log('USERSSSSS', users);
   //USERS WHO ARE ATTENDING THE MEETING
   var attending = '';
   for (var i = 0; i < users.length; i++) {
@@ -64,8 +66,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       attending += users[i].name + ', ';
     }
   }
+  console.log('ATTENDING', attending)
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
-  console.log('CALLING APIAI');
   axios.get('https://api.api.ai/api/query', {
    params: {
      v: 20150910,
@@ -119,14 +121,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       // })
       console.log('FINISHED LISTTTTTT', users);
       findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time, rtm, channel);
-      // console.log('GETTING BACK THIS', timeConflict);
-      // if (timeConflict.length) {
-      //   console.log('WHAT IS THIS', timeConflict)
-      //   rtm.sendMessage("This time is not available! Please pick another time.", channel);
-      // }
-      // if (result === false) {
-      //   return;
-      // }
       var attachments = [
               {
                 "fallback": "You are unable to choose an option.",
