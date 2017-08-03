@@ -28,6 +28,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   }
   channel = message.channel;
   //USE REGEX TO FILTER OUT SLACK USER'S REAL NAME AND SLACK ID
+  console.log('wejfijweifjiowejofw', message.text)
   var regex = /<@\w+>/g;
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
