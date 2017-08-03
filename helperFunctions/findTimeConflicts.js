@@ -1,7 +1,6 @@
 var moment = require('moment');
 var google = require('googleapis');
 var plus = google.plus('v1');
-var calendar = google.calendar('v3');
 var { oauth2Client } = require('./configureGoogle');
 
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
@@ -14,6 +13,7 @@ function findTimeConflicts(invitees, date, time) {
   for (var i = 0; i < invitees.length; i++) {
     console.log('WORKSSSS', invitees[i].google);
     gClient.setCredentials(invitees[i].google);
+    var calendar = google.calendar('v3');
     calendar.events.list({
       auth: gClient,
       calendarId: 'primary',
@@ -21,7 +21,7 @@ function findTimeConflicts(invitees, date, time) {
       timeMax: end,
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
-    }, function(events) {
+    }, function(err, events) {
       console.log("EVENTSSSSS", events);
     })
     //console.log('EVENTSSSSS', events);
