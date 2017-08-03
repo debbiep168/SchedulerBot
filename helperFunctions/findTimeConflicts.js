@@ -27,7 +27,8 @@ function findTimeConflicts(invitees, date, time) {
         return null;
       }
       else {
-        if (events.items === []) {
+        if (events.items.length === 0) {
+          console.log('i have no events at this time')
           return null;
         } else {
           console.log("EVENTSSSSS", events);
