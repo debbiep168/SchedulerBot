@@ -118,7 +118,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //   //if not given calendar access --> send message saying need permission
       // })
       console.log('FINISHED LISTTTTTT', users);
-      var timeConflict = findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time);
+      findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time, rtm, channel);
       console.log('GETTING BACK THIS', timeConflict);
       // if (timeConflict.length) {
       //   console.log('WHAT IS THIS', timeConflict)
