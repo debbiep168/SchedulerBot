@@ -2,6 +2,7 @@ var moment = require('moment');
 var google = require('googleapis');
 var plus = google.plus('v1');
 var { oauth2Client } = require('./configureGoogle');
+var { findAvailableTimes } = require('./availableTimes');
 
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
 function findTimeConflicts(invitees, date, time, rtm, channel) {
@@ -32,6 +33,7 @@ function findTimeConflicts(invitees, date, time, rtm, channel) {
           return;
         } else {
           console.log("EVENTSSSSS", events);
+          findAvailableTimes();
           rtm.sendMessage("This time is not available! Please pick another time.", channel);
           return;
         }
