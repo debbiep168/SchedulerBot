@@ -124,7 +124,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //   console.log('WHAT IS THIS', timeConflict)
       //   rtm.sendMessage("This time is not available! Please pick another time.", channel);
       // }
-      return;
       // if (result === false) {
       //   return;
       // }
