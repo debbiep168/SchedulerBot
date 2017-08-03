@@ -27,8 +27,12 @@ function findTimeConflicts(invitees, date, time) {
         return null;
       }
       else {
-        console.log("EVENTSSSSS", events);
-        return true;
+        if (events.items === []) {
+          return null;
+        } else {
+          console.log("EVENTSSSSS", events);
+          return true;
+        }
       }
     })
     //console.log('EVENTSSSSS', events);
