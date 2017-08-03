@@ -36,30 +36,44 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     userObj = rtm.dataStore.getUserById(userId);
     //console.log('THIS FINDS THE USER OBJECT FINE', userObj);
     //assume everyone is old user and already has gcalendar
-    User.findOne({user: userId})
-      .then((usr) => {
-        // if (usr.google === undefined) {
-        //   //send a message saying that the invitee hasn't set up their google calendar yet
-        //   return;
-        // }
-        console.log('FOUND THE USER', usr);
-        var userObjToPush = {
-          name: userObj.profile.first_name || userObj.profile.real_name,
-          email: userObj.profile.email,
-          userId: userId,
-          google: usr.google //ASSUME FOR NOW THAT EVERYONE HAS ALREADY SIGNED UP
-        }
-        users.push(userObjToPush);
-      })
-    // var userObjToPush = {
-    //   name: userObj.profile.first_name || userObj.profile.real_name,
-    //   email: userObj.profile.email,
-    //   userId: userId
-    // }
-    // users.push(userObjToPush);
+
+    // User.findOne({user: userId})
+    //   .then((usr) => {
+    //     // if (usr.google === undefined) {
+    //     //   //send a message saying that the invitee hasn't set up their google calendar yet
+    //     //   return;
+    //     // }
+    //     console.log('FOUND THE USER', usr);
+    //     var userObjToPush = {
+    //       name: userObj.profile.first_name || userObj.profile.real_name,
+    //       email: userObj.profile.email,
+    //       userId: userId,
+    //       google: usr.google //ASSUME FOR NOW THAT EVERYONE HAS ALREADY SIGNED UP
+    //     }
+    //     users.push(userObjToPush);
+    //   })
+
+    var userObjToPush = {
+      name: userObj.profile.first_name || userObj.profile.real_name,
+      email: userObj.profile.email,
+      userId: userId
+    }
+    users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   console.log('USERSSSSS', users);
+  User.find()
+    .then((usrArr) => {
+      for (var i = 0; i < usrArr.length; i++) {
+        for (var j = 0; j < users.length; j++) {
+          if (usrArr[i].user === users[j].userId) {
+            users[j].google = usrArr[i].google;
+          }
+        }
+      }
+      console.log('USERSSSS AFTER ADDING GOOGLE', users);
+      return;
+    })
   //USERS WHO ARE ATTENDING THE MEETING
   var attending = '';
   for (var i = 0; i < users.length; i++) {
@@ -70,7 +84,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       attending += users[i].name + ', ';
     }
   }
-  console.log('ATTENDING', attending)
+  console.log('ATTENDING', attending);
+  return;
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
