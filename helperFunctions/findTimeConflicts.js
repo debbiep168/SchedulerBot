@@ -22,7 +22,7 @@ function findTimeConflicts(invitees, date, time) {
       timeZone: "America/Los_Angeles",
       alwaysIncludeEmail: true,
     }, function(err, events) {
-      console.log("EVENTSSSSS", events);
+      console.log("EVENTSSSSS", events, err);
     })
     //console.log('EVENTSSSSS', events);
   }
