@@ -32,7 +32,9 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   var regex = /<@\w+>/g;
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
+    console.log('USERID IS', userId);
     userObj = rtm.dataStore.getUserById(userId);
+    console.log('THIS FINDS THE USER OBJECT FINE', userObj);
     //assume everyone is old user and already has gcalendar
     User.findOne({user: userId})
       .then((usr) => {
@@ -40,6 +42,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         //   //send a message saying that the invitee hasn't set up their google calendar yet
         //   return;
         // }
+        console.log('FOUND THE USER', usr);
         var userObjToPush = {
           name: userObj.profile.first_name || userObj.profile.real_name,
           email: userObj.profile.email,
