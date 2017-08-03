@@ -12,10 +12,7 @@ function findTimeConflicts(invitees, date, time) {
   var start = moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00');
   var end = moment.utc(dateTimeString).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ss-07:00');
   for (var i = 0; i < invitees.length; i++) {
-     gClient.setCredentials({
-       access_token: invitees[i].google.id_token,
-       refresh_token: invitees[i].google.refresh_token
-     });
+    gClient.setCredentials(invitees[i].google);
     calendar.events.list({
       auth: gClient,
       calendarId: 'primary',
