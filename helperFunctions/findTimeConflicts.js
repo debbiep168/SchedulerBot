@@ -3,10 +3,10 @@ var google = require('googleapis');
 var plus = google.plus('v1');
 var calendar = google.calendar('v3');
 var { oauth2Client } = require('./configureGoogle');
-var gClient = oauth2Client();
 
 //FINDS TIME CONFLICTS OF ALL ATTENDEES ON THAT DAY AT THAT TIME
 function findTimeConflicts(invitees, date, time) {
+  var gClient = oauth2Client();
   var dateTimeString = date + 'T' + time;
   console.log('DATE TIME STRING', dateTimeString);
   var start = moment.utc(dateTimeString).format('YYYY-MM-DDTHH:mm:ss-07:00');
