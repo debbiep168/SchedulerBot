@@ -39,7 +39,7 @@ app.get('/connect/callback', function(req, res) {
     }
     else {
       oauth2Client().setCredentials(tokens);
-      plus.people.get({ auth: oauth2Client, userId: 'me'}, function(err, googleUser) {
+      plus.people.get({ auth: oauth2Client(), userId: 'me'}, function(err, googleUser) {
         if (err) {
           res.status(500).json({error: err});
         } else {
