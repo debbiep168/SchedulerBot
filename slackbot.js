@@ -35,10 +35,10 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     //assume everyone is old user and already has gcalendar
     User.findOne({user: userId})
       .then((usr) => {
-        if (usr.google === undefined) {
-          //send a message saying that the invitee hasn't set up their google calendar yet
-          return;
-        }
+        // if (usr.google === undefined) {
+        //   //send a message saying that the invitee hasn't set up their google calendar yet
+        //   return;
+        // }
         var userObjToPush = {
           name: userObj.profile.first_name || userObj.profile.real_name,
           email: userObj.profile.email,
