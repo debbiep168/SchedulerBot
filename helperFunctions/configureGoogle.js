@@ -6,7 +6,7 @@ function oauth2Client() {
   return new OAuth2 (
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  'https://floating-headland-63670.herokuapp.com/connect/callback'
+  'https://agile-reaches-64711.herokuapp.com/connect/callback'
 )};
 
 module.exports = {
