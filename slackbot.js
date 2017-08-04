@@ -35,24 +35,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     //console.log('USERID IS', userId);
     userObj = rtm.dataStore.getUserById(userId);
     //console.log('THIS FINDS THE USER OBJECT FINE', userObj);
-    //assume everyone is old user and already has gcalendar
-
-    // User.findOne({user: userId})
-    //   .then((usr) => {
-    //     // if (usr.google === undefined) {
-    //     //   //send a message saying that the invitee hasn't set up their google calendar yet
-    //     //   return;
-    //     // }
-    //     console.log('FOUND THE USER', usr);
-    //     var userObjToPush = {
-    //       name: userObj.profile.first_name || userObj.profile.real_name,
-    //       email: userObj.profile.email,
-    //       userId: userId,
-    //       google: usr.google //ASSUME FOR NOW THAT EVERYONE HAS ALREADY SIGNED UP
-    //     }
-    //     users.push(userObjToPush);
-    //   })
-
     var userObjToPush = {
       name: userObj.profile.first_name || userObj.profile.real_name,
       email: userObj.profile.email,
@@ -62,6 +44,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     return userObj.profile.first_name || userObj.profile.real_name;
   });
   console.log('USERSSSSS', users);
+  //assume everyone is old user and already has gcalendar
   User.find()
     .then((usrArr) => {
       for (var i = 0; i < usrArr.length; i++) {
@@ -72,19 +55,19 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
         }
       }
       console.log('USERSSSS AFTER ADDING GOOGLE', users);
+      //USERS WHO ARE ATTENDING THE MEETING
+      var attending = '';
+      for (var i = 0; i < users.length; i++) {
+        if (i === users.length - 1) {
+          attending += users[i].name;
+        }
+        else {
+          attending += users[i].name + ', ';
+        }
+      }
+      console.log('ATTENDING', attending);
       return;
     })
-  //USERS WHO ARE ATTENDING THE MEETING
-  var attending = '';
-  for (var i = 0; i < users.length; i++) {
-    if (i === users.length - 1) {
-      attending += users[i].name;
-    }
-    else {
-      attending += users[i].name + ', ';
-    }
-  }
-  console.log('ATTENDING', attending);
   //PARSING MESSAGE USING API.AI TO GET TASK AND DATE
   axios.get('https://api.api.ai/api/query', {
    params: {
