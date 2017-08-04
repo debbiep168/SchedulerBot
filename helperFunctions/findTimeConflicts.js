@@ -33,7 +33,7 @@ function findTimeConflicts(invitees, date, time, rtm, channel) {
           return;
         } else {
           console.log("EVENTSSSSS", events);
-          findAvailableTimes(start);
+          //findAvailableTimes(start);
           rtm.sendMessage("This time is not available! Please pick another time.", channel);
           return;
         }
