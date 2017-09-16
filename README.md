@@ -2,6 +2,9 @@
 
 A language-aware and artificially intelligent Slackbot that can schedule reminders and meetings with other Slack users in Google Calendar
 
+## Features:
+1. Create reminders
+2. Schedule Meetings that automatically create Google Calendar Events for you
 
 ## Getting Started
 ### Prerequisites:
