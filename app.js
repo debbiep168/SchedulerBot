@@ -65,7 +65,6 @@ app.get('/connect/callback', function(req, res) {
 app.post('/slack/interactive', function(req, res) {
   var payload = JSON.parse(req.body.payload);
   var gClient = oauth2Client();
-  console.log('SLACK INTERACTIVEEEEEEE', oauth2Client);
   //SCHEDULING MEETINGS
   if (payload.callback_id === 'meeting') {
     if (payload.actions[0].value === 'true') {

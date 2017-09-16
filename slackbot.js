@@ -33,9 +33,7 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
   var attending = ''
   message.text = message.text.replace(regex, function(match) {
     var userId = match.slice(2, -1);
-    //console.log('USERID IS', userId);
     userObj = rtm.dataStore.getUserById(userId);
-    //console.log('THIS FINDS THE USER OBJECT FINE', userObj);
     var userObjToPush = {
       name: userObj.profile.first_name || userObj.profile.real_name,
       email: userObj.profile.email,
@@ -44,7 +42,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
     users.push(userObjToPush);
     return userObj.profile.first_name || userObj.profile.real_name;
   });
-  console.log('USERSSSSS', users);
   //assume everyone is old user and already has gcalendar
   User.find()
     .then((usrArr) => {
@@ -55,7 +52,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
           }
         }
       }
-      console.log('USERSSSS AFTER ADDING GOOGLE', users);
       //USERS WHO ARE ATTENDING THE MEETING
       var attending = '';
       for (var i = 0; i < users.length; i++) {
@@ -83,11 +79,8 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
    }
  })
   .then((response) => {
-    console.log('USERSSSSS22222222', users);
     //USER WANTS TO SCHEDULE A MEETING
-    console.log('RESPOSNEEEEEE', response.data.result.metadata);
     if (response.data.result.metadata.intentName === 'meeting') {
-      console.log('HERE');
       if(response.data.result.parameters.invitees.length === 0) {
         rtm.sendMessage('Who are you meeting with?', message.channel);
         return;
@@ -102,7 +95,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       }
       // User.find() //assume everyone has arleady given permission for now
       //   .then(function(mongoUsers) {
-      //     console.log('USERSSSS LIST', mongoUsers);
       //     mongoUsers.map((mUsr) => {
       //       if (mUsr.userId === users[i].userId) {
       //         users[i].google = mongoUsers[i].google;
@@ -112,7 +104,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       // users.map((usr) => {
       //   User.findOne({user: usr.userId})
       //     .then((user) => {
-      //       console.log('USRE IS', user)
       //       usr.google = user.google;
       //       return;
       //     })
@@ -122,7 +113,6 @@ rtm.on(RTM_EVENTS.MESSAGE, function (message) {
       //   checkCalendarAccess(usr, web, rtm);
       //   //if not given calendar access --> send message saying need permission
       // })
-      console.log('FINISHED LISTTTTTT', users);
       findTimeConflicts(users, response.data.result.parameters.date, response.data.result.parameters.time, rtm, channel);
       var attachments = [
               {
