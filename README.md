@@ -5,6 +5,9 @@ A language-aware and artificially intelligent Slackbot that can schedule reminde
 ## Features:
 1. Create reminders
 2. Schedule Meetings that automatically create Google Calendar Events for you
+3. Slackbot reminds you when your reminder is coming up
+4. Slackbot reminds you when you have a meeting soon
+5. Able to talk to an language-intelligent chatbot
 
 ## Getting Started
 ### Prerequisites:
